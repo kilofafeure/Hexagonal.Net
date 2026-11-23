@@ -6,6 +6,6 @@ namespace Domain.Ports.Secondary
     {
         void Save(Product product);
         List<Product> GetAll();
-        Product GetById(Guid id);
+        Product? GetById(Guid id);
     }
 }
