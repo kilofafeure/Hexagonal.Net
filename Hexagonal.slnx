@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/MinimalArchitecture/">
+    <Project Path="Domain/Domain.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,69 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+Debug*/
+Release*/
+x64/
+x86/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.filters
+*.code-workspace
+
+# Visual Studio generated files
+Generated\ Files/
+[Tt]est[Rr]esult*/
+*.tlog/
+*.log
+
+# .NET / NuGet
+project.lock.json
+project.assets.json
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET / configuration
+appsettings.*.json
+!appsettings.json
+secrets.json
+*.publishsettings
+
+# Tests and coverage
+coverage/
+Coverage/
+coverage.*
+*.coverage
+*.coveragexml
+*.cobertura.xml
+TestResults/
+
+# Resharper / Rider
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.idea/
+
+# Deployment
+publish/
+PublishProfiles/
+
+# OS files
+[Dd]esktop.ini
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
