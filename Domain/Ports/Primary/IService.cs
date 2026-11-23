@@ -6,6 +6,5 @@ namespace Domain.Ports.Primary
     {
         void Register(string name, decimal price);
         IEnumerable<Product> GetAll();
-        Product? GetById(Guid id);
     }
 }

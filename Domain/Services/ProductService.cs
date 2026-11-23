@@ -16,9 +16,5 @@ namespace Domain.Services
         public IEnumerable<Product> GetAll() {
             return _repository.GetAll();
         }
-
-        public Product? GetById(Guid id) {
-            return _repository.GetById(id);
-        }
     }
 }
