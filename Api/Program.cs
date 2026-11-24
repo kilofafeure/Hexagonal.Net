@@ -2,7 +2,9 @@ using Domain.Ports.Primary;
 using Domain.Ports.Secondary;
 using Domain.Services;
 using JsonRepository;
+using XMLRepository;
 using Scalar.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +16,21 @@ builder.Services.AddOpenApi(options =>
 });
 
 string pathFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "products.json");
+string xmlFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "products.xml");
 
-builder.Services.AddTransient<IRepository>(provider => new ProductRepository(pathFile));
-builder.Services.AddTransient<IService, ProductService>();
+builder.Services.AddKeyedTransient<IRepository>(
+    "json", (_, _) => new ProductRepository(pathFile));
+
+builder.Services.AddKeyedTransient<IRepository>(
+    "xml", (_, _) => new XMLProductRepository(xmlFile));
+
+builder.Services.AddKeyedTransient<IService>(
+    "json", (provider, _) =>
+        new ProductService(provider.GetRequiredKeyedService<IRepository>("json")));
+
+builder.Services.AddKeyedTransient<IService>(
+    "xml", (provider, _) =>
+        new ProductService(provider.GetRequiredKeyedService<IRepository>("xml")));
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -31,16 +45,32 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.MapGet("/products", (IService service) =>
-{
-    return service.GetAll();
-}).WithName("GetProducts");
+#region "************ JSON ************"
 
-app.MapPost("/products", (string name, decimal price, IService service) =>
+app.MapGet("/products",
+    ([FromKeyedServices("json")] IService service) => service.GetAll());
+
+app.MapPost("/products", (string name, decimal price,
+    [FromKeyedServices("json")] IService service) =>
 {
     service.Register(name, price);
     return Results.Created();
-}).WithName("AddProduct");
+});
+
+#endregion
+
+#region "************ XML ************"
+
+app.MapGet("/productsXML",
+    ([FromKeyedServices("xml")] IService service) => service.GetAll());
+
+app.MapPost("/productsXML", (string name, decimal price,
+    [FromKeyedServices("xml")] IService service) =>
+{
+    service.Register(name, price);
+    return Results.Created();
+});
+
+#endregion
 
 app.Run();
-

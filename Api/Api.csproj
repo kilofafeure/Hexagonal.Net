@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\JsonRepository\JsonRepository.csproj" />
+    <ProjectReference Include="..\XMLRepository\XMLRepository.csproj" />
   </ItemGroup>
 
 </Project>

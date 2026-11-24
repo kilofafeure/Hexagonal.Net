@@ -4,5 +4,6 @@
     <Project Path="ConsoleApp/ConsoleApp.csproj" Id="5d941d7c-8695-4654-96a1-1d85fb2c48ce" />
     <Project Path="Domain/Domain.csproj" />
     <Project Path="JsonRepository/JsonRepository.csproj" Id="d14e5598-17ac-4d99-9992-e22984c0c9b7" />
+    <Project Path="XMLRepository/XMLRepository.csproj" Id="6fbe41ff-067f-48c3-b3c4-f8234d68a924" />
   </Folder>
 </Solution>
