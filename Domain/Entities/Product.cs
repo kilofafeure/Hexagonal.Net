@@ -2,8 +2,9 @@
 {
     public class Product
     {
-        private readonly string _name = string.Empty;
-        private readonly decimal _price;
+        private string _name = string.Empty;
+        private decimal _price;
+
         public Guid Id { get; set; }
 
         public string Name
@@ -14,6 +15,8 @@
                 if (string.IsNullOrWhiteSpace(value)) {
                     throw new ArgumentNullException(nameof(value), "Name can't be empty");
                 }
+
+                _name = value;
             }
         }
 
@@ -26,6 +29,8 @@
                 {
                     throw new ArgumentNullException(nameof(value), "Price must be greater than 0");
                 }
+
+                _price = value;
             }
         }
 
