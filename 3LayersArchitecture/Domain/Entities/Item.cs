@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Domain3Layers.Entities
+namespace Domain.Entities
 {
     public class Item(int id, string title, bool isCompleted)
     {
