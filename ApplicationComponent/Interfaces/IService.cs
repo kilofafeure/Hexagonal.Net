@@ -8,6 +8,6 @@ namespace ApplicationComponent.Interfaces
     public interface IService
     {
         Task<IEnumerable<Item>> GetAsync();
-        Task AddAsync(string titlle);
+        Task AddAsync(string title);
     }
 }
