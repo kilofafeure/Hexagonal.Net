@@ -4,10 +4,19 @@ using System.Text;
 
 namespace Domain.Entities
 {
-    public class Item(int id, string title, bool isCompleted)
+    public class Item
     {
-        public int Id { get; set; } = id;
-        public string Title { get; set; } = title;
-        public bool IsCompleted { get; set; } = isCompleted;
+        public Item(int id, string title, bool isCompleted)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+            Id = id;
+            Title = title;
+            IsCompleted = isCompleted;
+        }
+
+        public int Id { get; private set; }
+        public string Title { get; private set; }
+        public bool IsCompleted { get; private set; }
     }
 }

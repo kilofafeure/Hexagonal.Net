@@ -12,24 +12,25 @@ namespace Repository
     {
         private readonly ItemsDbContext _context = context;
 
-        public async Task AddAsync(Item item)
+        public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
             var model = new ItemModel()
             {
                 Title = item.Title,
                 IsCompleted = item.IsCompleted,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
             };
 
             _context.ItemsModel.Add(model);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Item>> GetAllAsync()
+        public async Task<IEnumerable<Item>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _context.ItemsModel
+                .AsNoTracking()
                 .Select(e => new Item(e.Id, e.Title, e.IsCompleted))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

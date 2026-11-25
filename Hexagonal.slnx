@@ -1,8 +1,9 @@
 <Solution>
   <Folder Name="/3LayersArchitecture/">
+    <Project Path="3LayersArchitecture/Adapters/ConsoleApp/ConsoleApp.csproj" />
+    <Project Path="3LayersArchitecture/Application/Application.csproj" />
     <Project Path="3LayersArchitecture/Domain/Domain.csproj" Id="d5175f08-d421-4380-8a44-a0f48310ebaa" />
-    <Project Path="ApplicationComponent/Application.csproj" Id="7beff7da-f9cd-4350-9843-ee4cd3ea61bf" />
-    <Project Path="Repository/Repository.csproj" Id="d16279ed-f03b-4910-a9b2-4bfa7a5a6a07" />
+    <Project Path="3LayersArchitecture/Repository/Repository.csproj" />
   </Folder>
   <Folder Name="/MinimalArchitecture/">
     <Project Path="MinimalArchitecture/Api/Api.csproj" Id="52523833-0b3c-43cc-aaca-b5ab3522c3b7" />

@@ -11,15 +11,15 @@ namespace ApplicationComponent
     {
         private readonly IRepository _repository = repository;
 
-        public async Task AddAsync(string title)
+        public async Task AddAsync(string title, CancellationToken cancellationToken = default)
         {
             var item = new Item(0, title, false);
-            await _repository.AddAsync(item);
+            await _repository.AddAsync(item, cancellationToken);
         }
 
-        public async Task<IEnumerable<Item>> GetAsync()
+        public async Task<IEnumerable<Item>> GetAsync(CancellationToken cancellationToken = default)
         {
-            return await _repository.GetAllAsync();
+            return await _repository.GetAllAsync(cancellationToken);
         }
     }
 }
