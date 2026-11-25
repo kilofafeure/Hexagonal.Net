@@ -11,7 +11,7 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 string connectionString = configuration.GetConnectionString("DefaultConnection") 
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' no está configurada en appsettings.json.");
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' it's not configured appsettings.json.");
 
 await using var serviceProvider = new ServiceCollection()
     .AddDbContext<ItemsDbContext>(options => options.UseSqlServer(connectionString))
@@ -21,3 +21,52 @@ await using var serviceProvider = new ServiceCollection()
 
 await using var scope = serviceProvider.CreateAsyncScope();
 var itemService = scope.ServiceProvider.GetRequiredService<IService>();
+
+while (true) {
+    try
+    {
+        Console.WriteLine("\nSelect an option");
+        Console.WriteLine("1 - Add task");
+        Console.WriteLine("2 - Show all tasks");
+        Console.WriteLine("3 - Exit");
+        Console.WriteLine("Option: ");
+
+        string option = Console.ReadLine() ?? string.Empty;
+
+        switch (option)
+        {
+            case "1":
+                Console.Write("Set a task: ");
+                string title = Console.ReadLine() ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(title))
+                {
+                    Console.Write("\nTitle cannot be empty");
+                    break;
+                }
+
+                await itemService.AddAsync(title);
+                break;
+            case "2":
+                Console.WriteLine("\nGetting tasks...");
+                var items = await itemService.GetAsync();
+
+                Console.WriteLine("\nStored tasks: ");
+                foreach (var task in items)
+                {
+                    Console.WriteLine($"[{(task.IsCompleted ? "x" : " ")}] {task.Title}");
+                }
+                break;
+            case "3":
+                Console.Write("\nExiting...");
+                return;
+            default:
+                Console.Write("\nIncorrect option");
+                break;
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERROR: {ex.Message}");
+    }
+}
