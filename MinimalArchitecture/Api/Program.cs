@@ -4,7 +4,6 @@ using Domain.Services;
 using JsonRepository;
 using XMLRepository;
 using Scalar.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

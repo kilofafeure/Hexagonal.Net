@@ -4,6 +4,7 @@
     <Project Path="3LayersArchitecture/Application/Application.csproj" />
     <Project Path="3LayersArchitecture/Domain/Domain.csproj" Id="d5175f08-d421-4380-8a44-a0f48310ebaa" />
     <Project Path="3LayersArchitecture/Repository/Repository.csproj" />
+    <Project Path="3LayersArchitecture/Adapters/API/API.csproj" Id="40af88ca-139d-4b60-9211-5529dd8325db" />
   </Folder>
   <Folder Name="/MinimalArchitecture/">
     <Project Path="MinimalArchitecture/Api/Api.csproj" Id="52523833-0b3c-43cc-aaca-b5ab3522c3b7" />
