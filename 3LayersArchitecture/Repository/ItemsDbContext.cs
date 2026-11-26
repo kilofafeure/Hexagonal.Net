@@ -5,8 +5,8 @@ namespace Repository
 {
     public class ItemsDbContext(DbContextOptions<ItemsDbContext> options) : DbContext(options)
     {
-        public DbSet<ItemModel> ItemsModel { get; set; }
-        public DbSet<NoteModel> NotesModel { get; set; }
+        public DbSet<ItemModel> ItemsModel { get; set; } = null!;
+        public DbSet<NoteModel> NotesModel { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -13,7 +13,16 @@ namespace Repository
     {
         private readonly ItemsDbContext _context = context;
 
-        public async Task AddAsync(Note note, CancellationToken cancellationToken)
+        public async Task<Note?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.NotesModel
+                .AsNoTracking()
+                .Where(note => note.Id == id)
+                .Select(note => new Note(note.Id, note.ItemId, note.Message))
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task AddAsync(Note note, CancellationToken cancellationToken = default)
         {
             var model = new NoteModel()
             {
@@ -26,11 +35,12 @@ namespace Repository
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Note>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Note>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _context.NotesModel
+                .AsNoTracking()
                 .Select(n => new Note(n.Id, n.ItemId, n.Message))
-                .ToListAsync(cancellationToken: cancellationToken);
+                .ToListAsync(cancellationToken);
         }
     }
 }

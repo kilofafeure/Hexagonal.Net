@@ -47,12 +47,29 @@ app.MapGet("/items", async (IService<Item> service, CancellationToken cancellati
 })
 .WithName("GetItems");
 
-app.MapPost("/items", async (string title, IService<Item> service, CancellationToken cancellationToken) =>
+app.MapGet("/items/{id:int}", async (
+    int id,
+    IService<Item> service,
+    CancellationToken cancellationToken) =>
 {
-    if (string.IsNullOrWhiteSpace(title))
-        return Results.Problem("Title is mandatory.");
+    var item = await service.GetByIdAsync(id, cancellationToken);
+    return item is null ? Results.NotFound() : Results.Ok(item);
+})
+.WithName("GetItemById");
 
-    await service.AddAsync(new Item(0, title, false), cancellationToken);
+app.MapPost("/items", async (
+    CreateItemRequest request,
+    IService<Item> service,
+    CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Title))
+    {
+        return Results.Problem(
+            detail: "Title is required.",
+            statusCode: StatusCodes.Status400BadRequest);
+    }
+
+    await service.AddAsync(new Item(0, request.Title, false), cancellationToken);
     return Results.Created();
 })
 .WithName("CreateItem");
@@ -64,17 +81,48 @@ app.MapGet("/notes", async (IService<Note> service, CancellationToken cancellati
 })
 .WithName("GetNotes");
 
-app.MapPost("/notes", async (Note note, IService<Note> service, CancellationToken cancellationToken) =>
+app.MapGet("/notes/{id:int}", async (
+    int id,
+    IService<Note> service,
+    CancellationToken cancellationToken) =>
 {
-    if (string.IsNullOrWhiteSpace(note.Message))
-        return Results.Problem("Message is mandatory.");
+    var note = await service.GetByIdAsync(id, cancellationToken);
+    return note is null ? Results.NotFound() : Results.Ok(note);
+})
+.WithName("GetNoteById");
 
-    if (note.Message.Length > 100)
-        return Results.Problem("Message can't be longer than 100 characters.");
+app.MapPost("/items/{itemId:int}/notes", async (
+    int itemId,
+    CreateNoteRequest request,
+    IService<Item> itemService,
+    IService<Note> noteService,
+    CancellationToken cancellationToken) =>
+{
+    var item = await itemService.GetByIdAsync(itemId, cancellationToken);
 
-    await service.AddAsync(note, cancellationToken);
+    if (item is null)
+        return Results.NotFound();
+
+    if (string.IsNullOrWhiteSpace(request.Message))
+    {
+        return Results.Problem(
+            detail: "Message is required.",
+            statusCode: StatusCodes.Status400BadRequest);
+    }
+
+    if (request.Message.Length > 100)
+    {
+        return Results.Problem(
+            detail: "Message must be 100 characters or fewer.",
+            statusCode: StatusCodes.Status400BadRequest);
+    }
+
+    await noteService.AddAsync(new Note(0, itemId, request.Message), cancellationToken);
     return Results.Created();
 })
 .WithName("CreateNote");
 
 app.Run();
+
+public sealed record CreateItemRequest(string Title);
+public sealed record CreateNoteRequest(string Message);

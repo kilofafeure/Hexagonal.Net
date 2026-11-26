@@ -11,6 +11,11 @@ namespace Application
     {
         private readonly IRepository<Item> _repository = repository;
 
+        public Task<Item?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return _repository.GetByIdAsync(id, cancellationToken);
+        }
+
         public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
             await _repository.AddAsync(item, cancellationToken);

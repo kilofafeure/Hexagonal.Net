@@ -6,7 +6,7 @@ namespace Domain.Entities
 {
     public class Note
     {
-        public int Id { get; set; }
+        public int Id { get; private set; }
         public int ItemId { get; private set; }
         public string Message { get; private set; } = string.Empty;
 

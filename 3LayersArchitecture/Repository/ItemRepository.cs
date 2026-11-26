@@ -12,6 +12,15 @@ namespace Repository
     {
         private readonly ItemsDbContext _context = context;
 
+        public async Task<Item?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.ItemsModel
+                .AsNoTracking()
+                .Where(item => item.Id == id)
+                .Select(item => new Item(item.Id, item.Title, item.IsCompleted))
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
             var model = new ItemModel()

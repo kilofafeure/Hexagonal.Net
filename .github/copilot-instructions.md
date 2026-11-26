@@ -2,62 +2,59 @@
 
 ## Repository overview
 
-This is a small .NET 10 console application structured around ports-and-adapters/hexagonal architecture.
+This .NET 10 solution contains two architecture examples, grouped in `Hexagonal.slnx`:
 
-- `Domain/` is the core project. It contains the `Product` entity, primary/secondary port interfaces, and `ProductService` application logic.
-- `JsonRepository/` is the JSON persistence adapter implementing `Domain.Ports.Secondary.IRepository`.
-- `ConsoleApp/` is the composition root and user interface. It configures dependency injection and runs the console menu.
-- `Hexagonal.slnx` is the solution file. It groups the three projects under `MinimalArchitecture`.
+- `MinimalArchitecture/` contains `Api`, `ConsoleApp`, `Domain`, `JsonRepository`, and `XMLRepository` projects. It demonstrates ports and adapters with alternative persistence adapters.
+- `3LayersArchitecture/` contains `Domain`, `Application`, `Repository`, and API/console adapters. The API currently exposes `Item` and `Note` operations; the repository uses Entity Framework Core and SQL Server.
 
-Dependency direction: `ConsoleApp` depends on `Domain` and `JsonRepository`; `JsonRepository` depends on `Domain`; `Domain` does not reference the adapters or the console project.
+Keep the examples distinct. Do not move types or registrations between them unless the request explicitly asks for it.
 
-## Build and run commands
+### Dependency direction
 
-Run commands from the repository root.
+- In `MinimalArchitecture`, the application/domain core must not depend on API, console, or persistence implementations. Adapters depend inward on the core contracts.
+- In `3LayersArchitecture`, `Domain` is independent; `Application` depends on `Domain`; `Repository` depends on `Domain`; and `Adapters/API` and `Adapters/ConsoleApp` compose the application and infrastructure.
+- Keep dependency-injection registrations and runtime composition in adapter entry points, not in `Domain` or `Application`.
+
+## Build, run, and test
+
+Run commands from the repository root. Build the solution to validate changes across both examples:
 
 ```powershell
 dotnet build Hexagonal.slnx
-dotnet run --project ConsoleApp/ConsoleApp.csproj
 dotnet clean Hexagonal.slnx
 dotnet restore Hexagonal.slnx
 ```
 
-The solution currently has no test project and no test packages or lint configuration. Do not invent a test command or run one that only works after adding test infrastructure.
-
-Use the smallest project build while working on an isolated project:
+Run the relevant executable project when needed:
 
 ```powershell
-dotnet build Domain/Domain.csproj
-dotnet build JsonRepository/JsonRepository.csproj
-dotnet build ConsoleApp/ConsoleApp.csproj
+dotnet run --project MinimalArchitecture/ConsoleApp/ConsoleApp.csproj
+dotnet run --project MinimalArchitecture/Api/Api.csproj
+dotnet run --project 3LayersArchitecture/Adapters/ConsoleApp/ConsoleApp.csproj
+dotnet run --project 3LayersArchitecture/Adapters/API/API.csproj
 ```
 
-When no test project exists, there is also no single-test command to run.
+For an isolated change, build the smallest affected project. The solution currently has no test project or test packages; do not invent or run a test command that depends on adding test infrastructure.
 
-## Architecture and data flow
+## `3LayersArchitecture` conventions
 
-- `IService` is the primary port exposed to the console application.
-- `IRepository` is the secondary port used by the domain service for persistence.
-- `ProductService.Register` creates a `Product` and delegates persistence through `IRepository.Save`.
-- `ProductService.GetAll` delegates reads through `IRepository.GetAll`.
-- `ProductRepository` reads and writes the JSON file, adding a newly registered product to the deserialized list before rewriting the file.
+- `IService<TEntity>` is the application-facing port; `IRepository<TEntity>` is the persistence port. Keep their generic operations and `CancellationToken` parameters consistent through services and repositories.
+- Implement application behavior in `Application` services and persistence in `Repository`; API endpoints should depend on `IService<TEntity>`, not on EF Core or repository implementations.
+- Register `ItemsDbContext`, services, and repositories in the adapter composition root with scoped lifetimes.
+- Keep `Item` and `Note` validation in the domain entities. Avoid exposing domain entities as HTTP request DTOs; use request types in the API adapter.
+- Notes belong to an Item. Use the nested route `/items/{itemId}/notes` for note creation and verify that the parent Item exists before persisting a Note.
+- Return client error responses for invalid request data and `404 Not Found` for missing resources; do not turn validation failures into server errors.
+- Use `AsNoTracking()` for read-only EF Core queries, pass cancellation tokens to EF operations, and use UTC timestamps for persisted creation times.
+- `ItemsDbContext` maps `ItemModel` and `NoteModel`; preserve the required Note-to-Item foreign key relationship and cascade behavior unless a requirement changes it.
+- Keep the configured connection string in the API's `appsettings.json` unless asked to change configuration. Do not replace it with a guessed value.
 
-The console application's `IRepository` registration supplies `ProductRepository` with a file path. The default data file is:
+## `MinimalArchitecture` conventions
 
-```text
-<AppDomain.CurrentDomain.BaseDirectory>/products.json
-```
+- Preserve the ports-and-adapters dependency boundaries and use the repository implementation registered by the relevant adapter composition root.
+- Keep persistence-specific behavior in `JsonRepository` or `XMLRepository`; keep the domain/application core independent of their file formats and implementation details.
+- Reuse existing serialization options and repository helpers rather than recreating configuration for each operation.
 
-A different repository implementation can be substituted through the `IRepository` registration in `ConsoleApp/Program.cs`.
+## General conventions
 
-## Conventions specific to this repository
-
-- Preserve the dependency boundaries: domain code must depend on domain interfaces and entities, not on `JsonRepository` or `ConsoleApp` types.
-- Implement `IService` in domain application services and `IRepository` in infrastructure adapters.
-- Use constructor injection for `ProductService` and `ProductRepository`, as established in the current primary constructors.
-- Keep the service provider and runtime composition wiring in `ConsoleApp/Program.cs`; do not move it into `Domain`.
-- Add new repository implementations under an adapter project and register them in `ConsoleApp/Program.cs` through `IRepository`.
-- The persistence JSON is indented by `WriteIndented = true`. Reuse the cached `JsonSerializerOptions` instance in `ProductRepository` rather than constructing options on every `Save` call.
-- Entity validation belongs in `Domain.Entities.Product` setters/constructor logic. Preserve `Guid`-based product identity and decimal prices.
-- Console input is parsed and validated in `Program.cs`; invalid name or price input should remain a menu-loop error rather than terminate the application.
 - All projects target `net10.0`, enable implicit usings, and enable nullable reference types.
+- Follow existing naming, formatting, and composition patterns in the specific architecture being changed. Avoid unrelated refactoring.

@@ -11,12 +11,17 @@ namespace Application
     {
         private readonly IRepository<Note> _repository = repository;
 
-        public async Task AddAsync(Note entity, CancellationToken cancellationToken)
+        public Task<Note?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return _repository.GetByIdAsync(id, cancellationToken);
+        }
+
+        public async Task AddAsync(Note entity, CancellationToken cancellationToken = default)
         {
             await _repository.AddAsync(entity, cancellationToken);
         }
 
-        public async Task<IEnumerable<Note>> GetAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Note>> GetAsync(CancellationToken cancellationToken = default)
         {
             return await _repository.GetAllAsync(cancellationToken);
         }

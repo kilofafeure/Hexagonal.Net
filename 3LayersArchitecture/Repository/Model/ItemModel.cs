@@ -10,6 +10,6 @@ namespace Repository.Model
         public string Title { get; set; } = string.Empty;
         public bool IsCompleted { get; set; }
         public DateTime CreatedDate { get; set; }
-        public ICollection<NoteModel>? Notes { get; set; } = [];
+        public ICollection<NoteModel> Notes { get; set; } = [];
     }
 }
