@@ -7,13 +7,12 @@ using System.Text;
 
 namespace Application
 {
-    public  class ItemService(IRepository repository) : IService
+    public  class ItemService(IRepository<Item> repository) : IService<Item>
     {
-        private readonly IRepository _repository = repository;
+        private readonly IRepository<Item> _repository = repository;
 
-        public async Task AddAsync(string title, CancellationToken cancellationToken = default)
+        public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
-            var item = new Item(0, title, false);
             await _repository.AddAsync(item, cancellationToken);
         }
 

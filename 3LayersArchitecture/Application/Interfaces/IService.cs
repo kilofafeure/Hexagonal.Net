@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Application.Interfaces
 {
-    public interface IService
+    public interface IService<TEntity>
     {
-        Task<IEnumerable<Item>> GetAsync(CancellationToken cancellationToken = default);
-        Task AddAsync(string title, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetAsync(CancellationToken cancellationToken = default);
+        Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     }
 }

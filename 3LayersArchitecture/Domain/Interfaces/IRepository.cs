@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Domain.Interfaces
 {
-    public interface IRepository
+    public interface IRepository<TEntity>
     {
-        Task<IEnumerable<Item>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task AddAsync(Item item, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task AddAsync(TEntity item, CancellationToken cancellationToken = default);
     }
 }

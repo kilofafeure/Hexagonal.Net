@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Repository
 {
-    public class ItemRepository(ItemsDbContext context) : IRepository
+    public class ItemRepository(ItemsDbContext context) : IRepository<Item>
     {
         private readonly ItemsDbContext _context = context;
 

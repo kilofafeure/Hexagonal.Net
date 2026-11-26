@@ -1,5 +1,6 @@
 using Application;
 using Application.Interfaces;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -15,8 +16,8 @@ builder.Services.AddOpenApi(options =>
 });
 
 
-builder.Services.AddScoped<IRepository, ItemRepository>();
-builder.Services.AddScoped<IService, ItemService>();
+builder.Services.AddScoped<IRepository<Item>, ItemRepository>();
+builder.Services.AddScoped<IService<Item>, ItemService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' it's not configured.");
@@ -37,19 +38,19 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.MapGet("/items", async (IService service, CancellationToken cancellationToken) =>
+app.MapGet("/items", async (IService<Item> service, CancellationToken cancellationToken) =>
 {
     var items = await service.GetAsync(cancellationToken);
     return Results.Ok(items);
 })
 .WithName("GetItems");
 
-app.MapPost("/items", async (string title, IService service, CancellationToken cancellationToken) =>
+app.MapPost("/items", async (string title, IService<Item> service, CancellationToken cancellationToken) =>
 {
     if (string.IsNullOrWhiteSpace(title))
         return Results.Problem("Title is mandatory.");
 
-    await service.AddAsync(title, cancellationToken);
+    await service.AddAsync(new Item(0, title, false), cancellationToken);
     return Results.Created();
 })
 .WithName("CreateItem");

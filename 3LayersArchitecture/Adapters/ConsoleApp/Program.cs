@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Interfaces;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,12 +16,12 @@ string connectionString = configuration.GetConnectionString("DefaultConnection")
 
 await using var serviceProvider = new ServiceCollection()
     .AddDbContext<ItemsDbContext>(options => options.UseSqlServer(connectionString))
-    .AddScoped<IRepository, ItemRepository>()
-    .AddScoped<IService, ItemService>()
+    .AddScoped<IRepository<Item>, ItemRepository>()
+    .AddScoped<IService<Item>, ItemService>()
     .BuildServiceProvider();
 
 await using var scope = serviceProvider.CreateAsyncScope();
-var itemService = scope.ServiceProvider.GetRequiredService<IService>();
+var itemService = scope.ServiceProvider.GetRequiredService<IService<Item>>();
 
 while (true) {
     try
@@ -45,7 +46,7 @@ while (true) {
                     break;
                 }
 
-                await itemService.AddAsync(title);
+                await itemService.AddAsync(new Item(0, title, false));
                 break;
             case "2":
                 Console.WriteLine("\nGetting tasks...");
