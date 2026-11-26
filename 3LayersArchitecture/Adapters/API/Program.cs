@@ -1,5 +1,5 @@
-using ApplicationComponent;
-using ApplicationComponent.Interfaces;
+using Application;
+using Application.Interfaces;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Repository;

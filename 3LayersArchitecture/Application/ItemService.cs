@@ -1,11 +1,11 @@
-﻿using ApplicationComponent.Interfaces;
+﻿using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ApplicationComponent
+namespace Application
 {
     public  class ItemService(IRepository repository) : IService
     {
