@@ -10,12 +10,22 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ItemModel>().ToTable("Item");
-            modelBuilder.Entity<NoteModel>().ToTable("Note")
-                .HasOne(n => n.Item)
-                .WithMany(n => n.Notes)
-                .HasForeignKey(n => n.ItemId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ItemModel>()
+                .ToTable("Item");
+
+            modelBuilder.Entity<NoteModel>(entity =>
+            {
+                entity.ToTable("Note");
+                entity.Property(note => note.Color)
+                    .HasColumnType("varchar(6)")
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsRequired(false);
+                entity.HasOne(note => note.Item)
+                    .WithMany(item => item.Notes)
+                    .HasForeignKey(note => note.ItemId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

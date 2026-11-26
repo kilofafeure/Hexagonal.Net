@@ -1,3 +1,4 @@
+using API.Contracts;
 using Application;
 using Application.Interfaces;
 using Domain.Entities;
@@ -43,7 +44,7 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/items", async (IService<Item> service, CancellationToken cancellationToken) =>
 {
     var items = await service.GetAsync(cancellationToken);
-    return Results.Ok(items);
+    return Results.Ok(items.Select(ItemResponse.FromDomain).ToArray());
 })
 .WithName("GetItems");
 
@@ -53,7 +54,9 @@ app.MapGet("/items/{id:int}", async (
     CancellationToken cancellationToken) =>
 {
     var item = await service.GetByIdAsync(id, cancellationToken);
-    return item is null ? Results.NotFound() : Results.Ok(item);
+    return item is null
+        ? Results.NotFound()
+        : Results.Ok(ItemResponse.FromDomain(item));
 })
 .WithName("GetItemById");
 
@@ -77,7 +80,7 @@ app.MapPost("/items", async (
 app.MapGet("/notes", async (IService<Note> service, CancellationToken cancellationToken) =>
 {
     var notes = await service.GetAsync(cancellationToken);
-    return Results.Ok(notes);
+    return Results.Ok(notes.Select(NoteResponse.FromDomain).ToArray());
 })
 .WithName("GetNotes");
 
@@ -87,7 +90,9 @@ app.MapGet("/notes/{id:int}", async (
     CancellationToken cancellationToken) =>
 {
     var note = await service.GetByIdAsync(id, cancellationToken);
-    return note is null ? Results.NotFound() : Results.Ok(note);
+    return note is null
+        ? Results.NotFound()
+        : Results.Ok(NoteResponse.FromDomain(note));
 })
 .WithName("GetNoteById");
 
@@ -117,12 +122,18 @@ app.MapPost("/items/{itemId:int}/notes", async (
             statusCode: StatusCodes.Status400BadRequest);
     }
 
-    await noteService.AddAsync(new Note(0, itemId, request.Message), cancellationToken);
+    if (request.Color?.Length > 6)
+    {
+        return Results.Problem(
+            detail: "Color must be 6 characters or fewer.",
+            statusCode: StatusCodes.Status400BadRequest);
+    }
+
+    await noteService.AddAsync(
+        new Note(0, itemId, request.Message, request.Color),
+        cancellationToken);
     return Results.Created();
 })
 .WithName("CreateNote");
 
 app.Run();
-
-public sealed record CreateItemRequest(string Title);
-public sealed record CreateNoteRequest(string Message);

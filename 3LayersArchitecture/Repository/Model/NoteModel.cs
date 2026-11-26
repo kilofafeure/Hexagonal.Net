@@ -10,7 +10,7 @@ namespace Repository.Model
         public int ItemId { get; set; }
         public string Message { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
-        public string Color { get; set; } = string.Empty;
+        public string? Color { get; set; }
         public ItemModel Item { get; set; } = null!;
 
     }

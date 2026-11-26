@@ -18,7 +18,7 @@ namespace Repository
             return await _context.NotesModel
                 .AsNoTracking()
                 .Where(note => note.Id == id)
-                .Select(note => new Note(note.Id, note.ItemId, note.Message))
+                .Select(note => new Note(note.Id, note.ItemId, note.Message, note.Color))
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
@@ -28,6 +28,7 @@ namespace Repository
             {
                 Message = note.Message,
                 ItemId = note.ItemId,
+                Color = note.Color,
                 CreatedDate = DateTime.UtcNow
             };
 
@@ -39,7 +40,7 @@ namespace Repository
         {
             return await _context.NotesModel
                 .AsNoTracking()
-                .Select(n => new Note(n.Id, n.ItemId, n.Message))
+                .Select(n => new Note(n.Id, n.ItemId, n.Message, n.Color))
                 .ToListAsync(cancellationToken);
         }
     }
