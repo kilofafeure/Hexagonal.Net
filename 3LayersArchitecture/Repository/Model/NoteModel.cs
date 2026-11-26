@@ -11,7 +11,7 @@ namespace Repository.Model
         public string Message { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public string Color { get; set; } = string.Empty;
-        public required ItemModel Item { get; set; }
+        public ItemModel Item { get; set; }
 
     }
 }
