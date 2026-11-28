@@ -5,6 +5,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Repository;
+using Repository.Factories;
 using Repository.Mapping;
 using Repository.Model;
 using Scalar.AspNetCore;
@@ -20,6 +21,8 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.AddScoped<IMapper<ItemModel, Item>, ItemMapper>();
 builder.Services.AddScoped<IMapper<NoteModel, Note>, NoteMapper>();
+builder.Services.AddScoped<ItemModelFactory>();
+builder.Services.AddScoped<NoteModelFactory>();
 
 builder.Services.AddScoped<IRepository<Item>, ItemRepository>();
 builder.Services.AddScoped<IService<Item>, ItemService>();

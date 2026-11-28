@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Repository.Factories;
 using Repository.Mapping;
 using Repository.Model;
 
@@ -8,10 +9,12 @@ namespace Repository
 {
     public class ItemRepository(
         ItemsDbContext context,
-        IMapper<ItemModel, Item> mapper) : IRepository<Item>
+        IMapper<ItemModel, Item> mapper,
+        ItemModelFactory factory) : IRepository<Item>
     {
         private readonly ItemsDbContext _context = context;
         private readonly IMapper<ItemModel, Item> _mapper = mapper;
+        private readonly ItemModelFactory _factory = factory;
 
         public async Task<Item?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
@@ -24,9 +27,7 @@ namespace Repository
 
         public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
-            var model = _mapper.ToModel(item);
-            model.DateCreate = DateTime.UtcNow;
-
+            var model = _factory.Create(item);
             _context.ItemsModel.Add(model);
             await _context.SaveChangesAsync(cancellationToken);
         }
