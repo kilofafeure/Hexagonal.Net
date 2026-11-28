@@ -10,7 +10,7 @@ namespace Repository
     public class ItemRepository(
         ItemsDbContext context,
         IMapper<ItemModel, Item> mapper,
-        ItemModelFactory factory) : IRepository<Item>
+        ItemModelFactory factory) : IRepository<Item>, ICompleteRepository
     {
         private readonly ItemsDbContext _context = context;
         private readonly IMapper<ItemModel, Item> _mapper = mapper;
@@ -39,6 +39,13 @@ namespace Repository
                 .ToListAsync(cancellationToken);
 
             return models.Select(_mapper.ToEntity).ToList();
+        }
+
+        public async Task Complete(int id)
+        {
+            var model = await _context.ItemsModel.FindAsync(id) ?? throw new InvalidOperationException($"Item {id} not found");
+            model.IsCompleted = true;
+            await _context.SaveChangesAsync();
         }
     }
 }

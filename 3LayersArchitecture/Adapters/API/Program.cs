@@ -30,6 +30,9 @@ builder.Services.AddScoped<IService<Item>, ItemService>();
 builder.Services.AddScoped<IRepository<Note>, NoteRepository>();
 builder.Services.AddScoped<IService<Note>, NoteService>();
 
+builder.Services.AddScoped<ICompleteService, CompleteItemService>();
+builder.Services.AddScoped<ICompleteRepository, ItemRepository>();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' it's not configured.");
 
@@ -143,5 +146,23 @@ app.MapPost("/items/{itemId:int}/notes", async (
     return Results.Created();
 })
 .WithName("CreateNote");
+
+app.MapPut("completeItem/{id}", async (ICompleteService service, int id) =>
+{
+    try
+    {
+        await service.Complete(id);
+        return Results.NoContent();
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return Results.InternalServerError(ex.Message);
+    }
+})
+.WithName("CompleteItem");
 
 app.Run();
