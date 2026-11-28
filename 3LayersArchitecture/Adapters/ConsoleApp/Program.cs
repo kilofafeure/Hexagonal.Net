@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
+using Repository.Mapping;
+using Repository.Model;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -16,6 +18,7 @@ string connectionString = configuration.GetConnectionString("DefaultConnection")
 
 await using var serviceProvider = new ServiceCollection()
     .AddDbContext<ItemsDbContext>(options => options.UseSqlServer(connectionString))
+    .AddScoped<IMapper<ItemModel, Item>, ItemMapper>()
     .AddScoped<IRepository<Item>, ItemRepository>()
     .AddScoped<IService<Item>, ItemService>()
     .BuildServiceProvider();

@@ -1,34 +1,31 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Repository.Mapping;
 using Repository.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Repository
 {
-    public class ItemRepository(ItemsDbContext context) : IRepository<Item>
+    public class ItemRepository(
+        ItemsDbContext context,
+        IMapper<ItemModel, Item> mapper) : IRepository<Item>
     {
         private readonly ItemsDbContext _context = context;
+        private readonly IMapper<ItemModel, Item> _mapper = mapper;
 
         public async Task<Item?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _context.ItemsModel
+            var model = await _context.ItemsModel
                 .AsNoTracking()
-                .Where(item => item.Id == id)
-                .Select(item => new Item(item.Id, item.Title, item.IsCompleted))
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+
+            return model is null ? null : _mapper.ToEntity(model);
         }
 
         public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
         {
-            var model = new ItemModel()
-            {
-                Title = item.Title,
-                IsCompleted = item.IsCompleted,
-                CreatedDate = DateTime.UtcNow,
-            };
+            var model = _mapper.ToModel(item);
+            model.DateCreate = DateTime.UtcNow;
 
             _context.ItemsModel.Add(model);
             await _context.SaveChangesAsync(cancellationToken);
@@ -36,10 +33,11 @@ namespace Repository
 
         public async Task<IEnumerable<Item>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.ItemsModel
+            var models = await _context.ItemsModel
                 .AsNoTracking()
-                .Select(e => new Item(e.Id, e.Title, e.IsCompleted))
                 .ToListAsync(cancellationToken);
+
+            return models.Select(_mapper.ToEntity).ToList();
         }
     }
 }

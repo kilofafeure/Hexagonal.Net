@@ -5,6 +5,8 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Repository;
+using Repository.Mapping;
+using Repository.Model;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,9 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddScalarTransformers(); // Habilita las extensiones de Scalar
 });
+
+builder.Services.AddScoped<IMapper<ItemModel, Item>, ItemMapper>();
+builder.Services.AddScoped<IMapper<NoteModel, Note>, NoteMapper>();
 
 builder.Services.AddScoped<IRepository<Item>, ItemRepository>();
 builder.Services.AddScoped<IService<Item>, ItemService>();

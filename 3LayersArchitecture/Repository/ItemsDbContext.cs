@@ -10,12 +10,18 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ItemModel>()
-                .ToTable("Item");
+            modelBuilder.Entity<ItemModel>(entity =>
+            {
+                entity.ToTable("Item");
+                entity.Property(item => item.DateCreate)
+                    .HasColumnName("CreatedDate");
+            });
 
             modelBuilder.Entity<NoteModel>(entity =>
             {
                 entity.ToTable("Note");
+                entity.Property(note => note.DateCreate)
+                    .HasColumnName("DateCreate");
                 entity.Property(note => note.Color)
                     .HasColumnType("varchar(6)")
                     .HasMaxLength(6)
